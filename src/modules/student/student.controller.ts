@@ -5,13 +5,12 @@ import studentValidationSchema from './student.validation';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
-    //creating schema validation for Joi
-
     const { student } = req.body;
 
-    const { error } = studentValidationSchema.validate(student);
-    
-    const result = await studentServices.createStudentIntoDB(student);
+    //validation using Joi for student data
+    const { error, value } = studentValidationSchema.validate(student);
+
+    const result = await studentServices.createStudentIntoDB(value);
 
     if (error) {
       console.log(error);
