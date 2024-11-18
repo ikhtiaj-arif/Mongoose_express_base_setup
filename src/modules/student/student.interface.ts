@@ -17,13 +17,13 @@ export interface ILocalGuardian {
 }
 export interface IUserName {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 }
 export interface IStudent {
   id: string;
   name: IUserName;
-  gender: 'Male' | 'Female';
+  gender: 'Male' | 'Female' | 'Other';
   dateOfBirth?: string;
   email: string;
   contactNo: string;
