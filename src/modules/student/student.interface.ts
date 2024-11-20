@@ -1,4 +1,4 @@
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model, connect, Model } from 'mongoose';
 // 1. Create an interface representing a document in MongoDB.
 
 export interface IGuardian {
@@ -22,6 +22,7 @@ export interface IUserName {
 }
 export interface IStudent {
   id: string;
+  password:string;
   name: IUserName;
   gender: 'Male' | 'Female' | 'Other';
   dateOfBirth?: string;
@@ -35,4 +36,21 @@ export interface IStudent {
   localGuardian: ILocalGuardian;
   profileImg?: string;
   isActive: 'active' | 'blocked';
+  isDeleted: boolean
 }
+
+
+
+
+//for creating static methods
+export interface StudentModel extends Model<IStudent>{
+  isUserExists(id:string): Promise<IStudent | null> 
+}
+
+
+//for creating instance methods
+// export type StudentMethod = {
+//   isUserExists(id: string) : Promise<IStudent | null>;
+// }
+
+// export type StudentModel = Model<IStudent, Record<string, never>, StudentMethod>;
