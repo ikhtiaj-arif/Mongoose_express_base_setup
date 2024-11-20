@@ -28,11 +28,11 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'student is created successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
     res.status(500).json({
       success: false,
-      message: 'Something went wrong!',
+      message: error.message || 'Something went wrong!',
       error: error,
     });
   }
@@ -69,8 +69,29 @@ const getOneStudent = async (req: Request, res: Response) => {
   } catch (error) {}
 };
 
+
+const deleteStudent = async (req: Request, res: Response) => {
+  try {
+    const studentId = req.params.studentId;
+    const result = await studentServices.deleteStudentFromDB(studentId);
+
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: 'Student deleted successfully!',
+        data: result,
+      });
+    } else {
+      res.status(305).json({
+        success: true,
+        message: 'Invalid user id!',
+      });
+    }
+  } catch (error) {}
+}
+
 export const studentControllers = {
   createStudent,
   getAllStudents,
-  getOneStudent,
+  getOneStudent,deleteStudent
 };

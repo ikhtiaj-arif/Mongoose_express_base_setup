@@ -1,12 +1,16 @@
 // 2. Create a Schema corresponding to the document interface.
+import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
 
+import config from '../../app/config';
 import {
   IGuardian,
   ILocalGuardian,
   IStudent,
   IUserName,
+  // StudentMethod,
+  StudentModel,
 } from './student.interface';
 
 const userNameSchema = new Schema<IUserName>({
@@ -79,143 +83,135 @@ const localGuardianSchema = new Schema<ILocalGuardian>({
   },
 });
 
-const studentSchema = new Schema<IStudent>({
-  id: {
-    type: String,
-    required: [true, 'Student ID is required!'],
-    unique: true,
-  },
-  name: {
-    type: userNameSchema,
-    required: [true, 'Student Name is required!'],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ['Male', 'Female', 'Other'],
-      message:
-        "The gender field can only be one of the following: 'Male', 'Female', or 'Other'.",
+const studentSchema = new Schema<IStudent, StudentModel>(
+  {
+    id: {
+      type: String,
+      required: [true, 'Student ID is required!'],
+      unique: true,
     },
-    required: [true, 'Gender is required!'],
-  },
-  dateOfBirth: { type: String },
-  email: {
-    type: String,
-    required: [true, 'Email is required!'],
-    unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email type!',
+    password: {
+      type: String,
+      required: [true, 'Student password is required!'],
+    },
+    name: {
+      type: userNameSchema,
+      required: [true, 'Student Name is required!'],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['Male', 'Female', 'Other'],
+        message:
+          "The gender field can only be one of the following: 'Male', 'Female', or 'Other'.",
+      },
+      required: [true, 'Gender is required!'],
+    },
+    dateOfBirth: { type: String },
+    email: {
+      type: String,
+      required: [true, 'Email is required!'],
+      unique: true,
+      validate: {
+        validator: (value: string) => validator.isEmail(value),
+        message: '{VALUE} is not a valid email type!',
+      },
+    },
+    contactNo: {
+      type: String,
+      required: [true, 'Contact Number is required!'],
+    },
+    emergencyContactNo: {
+      type: String,
+      required: [true, 'Emergency Contact Number is required!'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    presentAddress: {
+      type: String,
+      required: [true, 'Present Address is required!'],
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, 'Permanent Address is required!'],
+    },
+    guardian: {
+      type: guardianSchema,
+      required: [true, 'Guardian information is required!'],
+    },
+    localGuardian: {
+      type: localGuardianSchema,
+      required: [true, 'Local Guardian information is required!'],
+    },
+    profileImg: { type: String },
+    isActive: {
+      type: String,
+      enum: ['active', 'blocked'],
+      default: 'active',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
-  contactNo: {
-    type: String,
-    required: [true, 'Contact Number is required!'],
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  emergencyContactNo: {
-    type: String,
-    required: [true, 'Emergency Contact Number is required!'],
-  },
-  bloodGroup: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-  },
-  presentAddress: {
-    type: String,
-    required: [true, 'Present Address is required!'],
-  },
-  permanentAddress: {
-    type: String,
-    required: [true, 'Permanent Address is required!'],
-  },
-  guardian: {
-    type: guardianSchema,
-    required: [true, 'Guardian information is required!'],
-  },
-  localGuardian: {
-    type: localGuardianSchema,
-    required: [true, 'Local Guardian information is required!'],
-  },
-  profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
+);
+//virtual
+studentSchema.virtual('fullName').get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName} `;
 });
 
-export const Student = model<IStudent>('Student', studentSchema);
+//!document middleware
+//pre save hook/middleware: will work on create() save()
+studentSchema.pre('save', async function (next) {
+  //hashing password and then save to db
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
 
-// import { Schema, model } from 'mongoose';
-// import {
-//   IGuardian,
-//   ILocalGuardian,
-//   IStudent,
-//   IUserName,
-// } from './student.interface';
+  next();
+});
 
-// const userNameSchema = new Schema<IUserName>({
-//   firstName: { type: String, required: [true, 'First Name Is Required!'] },
-//   middleName: { type: String },
-//   lastName: { type: String, required: [true, 'Last Name Is Required!'] },
+//post save hook/middleware
+studentSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+//!query middleware
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  // console.log(this);
+  next();
+});
+// studentSchema.pre('findOne', function (next) {
+//   this.find({ isDeleted: { $ne: true } });
+//   // console.log(this);
+//   next();
 // });
+studentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
 
-// const guardianSchema = new Schema<IGuardian>({
-//   fatherName: { type: String, required: true },
-//   fathersOccupation: { type: String, required: true },
-//   fatherContactNo: { type: String, required: true },
-//   motherName: { type: String, required: true },
-//   mothersOccupation: { type: String, required: true },
-//   motherContactNo: { type: String, required: true },
-// });
+//creating a custom static method
+studentSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
+  return existingUser;
+};
 
-// const localGuardianSchema = new Schema<ILocalGuardian>({
-//   name: { type: String, required: true },
-//   occupation: { type: String, required: true },
-//   contactNo: { type: String, required: true },
-//   address: { type: String, required: true },
-// });
+//creating a custom instance method
+// studentSchema.methods.isUserExists = async function (id: string) {
+//   const existingUser = await Student.findOne({ id });
+//   return existingUser;
+// };
 
-// const studentSchema = new Schema<IStudent>({
-//   id: { type: String, required: true, unique: true },
-//   name: {
-//     type: userNameSchema,
-//     required: true,
-//   },
-//   gender: {
-//     type: String,
-//     enum: {
-//       values: ['Male', 'Female', 'Other'],
-//       message:
-//         "The gender field can only be one of the following: 'Male','Female', or 'Other'.",
-//     },
-//     required: true,
-//   },
-//   dateOfBirth: { type: String },
-//   email: { type: String, required: true, unique: true },
-//   contactNo: { type: String, required: true },
-//   emergencyContactNo: { type: String, required: true },
-//   bloodGroup: {
-//     type: String,
-//     enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-//   },
-//   presentAddress: { type: String, required: true },
-//   permanentAddress: { type: String, required: true },
-//   guardian: {
-//     type: guardianSchema,
-//     required: true,
-//   },
-//   localGuardian: {
-//     type: localGuardianSchema,
-//     required: true,
-//   },
-//   profileImg: { type: String },
-//   isActive: {
-//     type: String,
-//     enum: ['active', 'blocked'],
-//     default: 'active',
-//   },
-// });
-
-// // 3. Create a Model.
-// export const Student = model<IStudent>('Student', studentSchema);
+export const Student = model<IStudent, StudentModel>('Student', studentSchema);
