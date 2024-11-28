@@ -20,6 +20,7 @@ const createStudent = async (req: Request, res: Response) => {
 
     //!creating schema validation using zod
     const zodParsedData = studentValidationSchema.parse(student);
+    console.log(zodParsedData);
 
     const result = await studentServices.createStudentIntoDB(zodParsedData);
 
@@ -28,11 +29,11 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'student is created successfully!',
       data: result,
     });
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error);
     res.status(500).json({
-      success: false,
       message: error.message || 'Something went wrong!',
+      success: false,
       error: error,
     });
   }
@@ -69,7 +70,6 @@ const getOneStudent = async (req: Request, res: Response) => {
   } catch (error) {}
 };
 
-
 const deleteStudent = async (req: Request, res: Response) => {
   try {
     const studentId = req.params.studentId;
@@ -88,10 +88,11 @@ const deleteStudent = async (req: Request, res: Response) => {
       });
     }
   } catch (error) {}
-}
+};
 
 export const studentControllers = {
   createStudent,
   getAllStudents,
-  getOneStudent,deleteStudent
+  getOneStudent,
+  deleteStudent,
 };
