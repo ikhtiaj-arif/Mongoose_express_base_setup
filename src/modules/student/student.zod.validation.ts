@@ -53,45 +53,48 @@ const localGuardianValidationSchema = z.object({
 });
 
 // Main Student ValidationSchema
-const studentValidationSchema = z.object({
-  id: z.string({ required_error: 'Student ID is required' }),
-  password: z.string({ required_error: ' Password is required' }),
-  name: userNameValidationSchema,
-  gender: z.enum(['Male', 'Female', 'Other'], {
-    required_error: 'Gender is required',
-    invalid_type_error:
-      "The gender field can only be one of the following: 'Male', 'Female', or 'Other'.",
-  }),
-  dateOfBirth: z
-    .string()
-    .optional()
-    .refine((value) => !value || !isNaN(Date.parse(value)), {
-      message: 'Date of Birth must be a valid date string',
+const createStudentValidationSchema = z.object({
+  body: z.object({
+    password: z.string({ required_error: ' Password is required' }),
+    student: z.object({
+      name: userNameValidationSchema,
+      gender: z.enum(['Male', 'Female', 'Other'], {
+        required_error: 'Gender is required',
+        invalid_type_error:
+          "The gender field can only be one of the following: 'Male', 'Female', or 'Other'.",
+      }),
+      dateOfBirth: z
+        .string()
+        .optional()
+        .refine((value) => !value || !isNaN(Date.parse(value)), {
+          message: 'Date of Birth must be a valid date string',
+        }),
+      email: z
+        .string({ required_error: 'Email is required' })
+        .email({ message: 'Email must be a valid email address' }),
+      contactNo: z.string({ required_error: 'Contact Number is required' }),
+      emergencyContactNo: z.string({
+        required_error: 'Emergency Contact Number is required',
+      }),
+      bloodGroup: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+        .optional(),
+      presentAddress: z.string({
+        required_error: 'Present Address is required',
+      }),
+      permanentAddress: z.string({
+        required_error: 'Permanent Address is required',
+      }),
+      guardian: guardianValidationSchema,
+      localGuardian: localGuardianValidationSchema,
+      profileImg: z
+        .string()
+        .optional()
+        .refine((value) => !value || value.startsWith('http'), {
+          message: 'Profile Image must be a valid URL',
+        }),
     }),
-  email: z
-    .string({ required_error: 'Email is required' })
-    .email({ message: 'Email must be a valid email address' }),
-  contactNo: z.string({ required_error: 'Contact Number is required' }),
-  emergencyContactNo: z.string({
-    required_error: 'Emergency Contact Number is required',
   }),
-  bloodGroup: z
-    .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
-    .optional(),
-  presentAddress: z.string({ required_error: 'Present Address is required' }),
-  permanentAddress: z.string({
-    required_error: 'Permanent Address is required',
-  }),
-  guardian: guardianValidationSchema,
-  localGuardian: localGuardianValidationSchema,
-  profileImg: z
-    .string()
-    .optional()
-    .refine((value) => !value || value.startsWith('http'), {
-      message: 'Profile Image must be a valid URL',
-    }),
-  isActive: z.enum(['active', 'blocked']).default('active'),
-  isDeleted: z.boolean().default(false),
 });
 
-export default studentValidationSchema;
+export const studentValidations = { createStudentValidationSchema };
