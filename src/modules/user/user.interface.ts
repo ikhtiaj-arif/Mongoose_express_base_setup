@@ -3,6 +3,12 @@ export interface IUser {
   password: string;
   needsPasswordChange: boolean;
   role: 'admin' | 'user' | 'faculty';
-  status: string
+  status: string;
   isDeleted: boolean;
+}
+
+export interface INewUser {
+  password: string;
+  role: string;
+  id: string;
 }

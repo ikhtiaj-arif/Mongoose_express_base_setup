@@ -90,10 +90,13 @@ const studentSchema = new Schema<IStudent, StudentModel>(
       required: [true, 'Student ID is required!'],
       unique: true,
     },
-    password: {
-      type: String,
-      required: [true, 'Student password is required!'],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User ID is required!'],
+      unique: true,
+      ref: 'User',
     },
+
     name: {
       type: userNameSchema,
       required: [true, 'Student Name is required!'],
@@ -146,11 +149,6 @@ const studentSchema = new Schema<IStudent, StudentModel>(
       required: [true, 'Local Guardian information is required!'],
     },
     profileImg: { type: String },
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -167,24 +165,7 @@ studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName} `;
 });
 
-//!document middleware
-//pre save hook/middleware: will work on create() save()
-studentSchema.pre('save', async function (next) {
-  //hashing password and then save to db
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds),
-  );
 
-  next();
-});
-
-//post save hook/middleware
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
 
 //!query middleware
 studentSchema.pre('find', function (next) {
