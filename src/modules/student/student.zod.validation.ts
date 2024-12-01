@@ -64,11 +64,12 @@ const createStudentValidationSchema = z.object({
           "The gender field can only be one of the following: 'Male', 'Female', or 'Other'.",
       }),
       dateOfBirth: z
-        .string()
+        .date()
         .optional()
-        .refine((value) => !value || !isNaN(Date.parse(value)), {
-          message: 'Date of Birth must be a valid date string',
-        }),
+        // .refine((value) => !value || !isNaN(Date.parse(value)), {
+        //   message: 'Date of Birth must be a valid date string',
+        // }),
+        ,
       email: z
         .string({ required_error: 'Email is required' })
         .email({ message: 'Email must be a valid email address' }),
