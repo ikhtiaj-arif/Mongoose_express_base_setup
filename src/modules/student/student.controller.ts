@@ -1,44 +1,12 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import { studentServices } from './student.service';
-import studentValidationSchema from './student.zod.validation';
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student } = req.body;
-
-    //!validation using Joi for student data
-    // const { error, value } = studentValidationSchema.validate(student);
-    // if (error) {
-    //   console.log(error);
-    //   res.status(500).json({
-    //     success: false,
-    //     message: 'Something went wrong!',
-    //     error: error.details,
-    //   });
-    // }
-
-    //!creating schema validation using zod
-    const zodParsedData = studentValidationSchema.parse(student);
-
-    const result = await studentServices.createStudentIntoDB(zodParsedData);
-
-    res.status(200).json({
-      success: true,
-      message: 'student is created successfully!',
-      data: result,
-    });
-  } catch (error:any) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Something went wrong!',
-      error: error,
-    });
-  }
-};
-
-const getAllStudents = async (req: Request, res: Response) => {
+const getAllStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await studentServices.getAllStudentsFromDB();
     res.status(200).json({
@@ -46,10 +14,16 @@ const getAllStudents = async (req: Request, res: Response) => {
       message: 'Retrieved all students data!',
       data: result,
     });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getOneStudent = async (req: Request, res: Response) => {
+const getOneStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const studentId = req.params.studentId;
     const result = await studentServices.getOneStudentFromDB(studentId);
@@ -66,11 +40,16 @@ const getOneStudent = async (req: Request, res: Response) => {
         message: 'Invalid user id!',
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
 
-
-const deleteStudent = async (req: Request, res: Response) => {
+const deleteStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const studentId = req.params.studentId;
     const result = await studentServices.deleteStudentFromDB(studentId);
@@ -87,11 +66,14 @@ const deleteStudent = async (req: Request, res: Response) => {
         message: 'Invalid user id!',
       });
     }
-  } catch (error) {}
-}
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const studentControllers = {
-  createStudent,
+  // createStudent,
   getAllStudents,
-  getOneStudent,deleteStudent
+  getOneStudent,
+  deleteStudent,
 };
