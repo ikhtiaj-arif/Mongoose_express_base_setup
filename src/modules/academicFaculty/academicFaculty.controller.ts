@@ -11,7 +11,7 @@ const {
 } = AcademicFacultyServices;
 
 const createAcademicFaculty = catchAsync(async (req, res, next) => {
-  console.log(req.body);
+
   const result = await createAcademicFacultyInToDB(req.body);
 
   sendResponse(res, {
