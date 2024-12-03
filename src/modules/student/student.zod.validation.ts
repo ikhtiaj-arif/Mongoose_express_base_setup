@@ -63,13 +63,10 @@ const createStudentValidationSchema = z.object({
         invalid_type_error:
           "The gender field can only be one of the following: 'Male', 'Female', or 'Other'.",
       }),
-      dateOfBirth: z
-        .date()
-        .optional()
-        // .refine((value) => !value || !isNaN(Date.parse(value)), {
-        //   message: 'Date of Birth must be a valid date string',
-        // }),
-        ,
+      dateOfBirth: z.string().optional(),
+      // .refine((value) => !value || !isNaN(Date.parse(value)), {
+      //   message: 'Date of Birth must be a valid date string',
+      // }),
       email: z
         .string({ required_error: 'Email is required' })
         .email({ message: 'Email must be a valid email address' }),
@@ -88,6 +85,7 @@ const createStudentValidationSchema = z.object({
       }),
       guardian: guardianValidationSchema,
       localGuardian: localGuardianValidationSchema,
+      admissionSemester: z.string(),
       profileImg: z
         .string()
         .optional()

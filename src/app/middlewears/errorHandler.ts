@@ -1,5 +1,5 @@
 // Error Handler
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 const errorHandler = (
   err: any,
   req: Request,
@@ -14,8 +14,8 @@ const errorHandler = (
     });
   } else {
     res.status(500).json({
-      message: err._message,
       success: false,
+      message: err.message || err._message,
       error: err || 'Something went wrong',
     });
   } // next()

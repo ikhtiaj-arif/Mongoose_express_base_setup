@@ -26,7 +26,7 @@ export interface IStudent {
   password:string;
   name: IUserName;
   gender: 'Male' | 'Female' | 'Other';
-  dateOfBirth?: Date;
+  dateOfBirth?: String;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
@@ -36,6 +36,7 @@ export interface IStudent {
   guardian: IGuardian;
   localGuardian: ILocalGuardian;
   profileImg?: string;
+  admissionSemester: Types.ObjectId;
   isDeleted: boolean
 }
 

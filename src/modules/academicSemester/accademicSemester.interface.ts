@@ -16,10 +16,14 @@ export type TAcademicSemesterNames = 'Autumn' | 'Summer' | 'Fall';
 
 export type TAcademicSemesterCodes = '01' | '02' | '03';
 
+export type TAcaSemNameMap = {
+  [key: string]: string;
+};
+
 export interface IAcademicSemester {
   name: 'Autumn' | 'Summer' | 'Fall';
   code: '01' | '02' | '03';
-  year: Date;
+  year: String;
   startMonth: TMonths;
   endMonth: TMonths;
 }
