@@ -6,18 +6,26 @@ const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  if (err.statusCode === 404) {
-    res.status(404).json({
-      message: err._message,
-      success: false,
-      error: err.message || err,
-    });
-  } else {
-    res.status(500).json({
-      success: false,
-      message: err.message || err._message,
-      error: err || 'Something went wrong',
-    });
-  } // next()
+const statusCode = err.statusCode || 500
+const message = err.message || 'Something went wrong'
+
+  res.status(statusCode).json({
+    message,
+    success: false,
+    error:  err,
+  });
+  // if (err.statusCode === 404) {
+  //   res.status(404).json({
+  //     message: err._message,
+  //     success: false,
+  //     error: err.message || err,
+  //   });
+  // } else {
+  //   res.status(500).json({
+  //     success: false,
+  //     message: err.message || err._message,
+  //     error: err || 'Something went wrong',
+  //   });
+  // } // next()
 };
 export default errorHandler;
