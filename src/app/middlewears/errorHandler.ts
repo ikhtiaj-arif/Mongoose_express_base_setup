@@ -1,31 +1,58 @@
-// Error Handler
-import { NextFunction, Request, Response } from 'express';
-const errorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-const statusCode = err.statusCode || 500
-const message = err.message || 'Something went wrong'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+
+import { ErrorRequestHandler } from 'express';
+import { ZodError, ZodIssue } from 'zod';
+import { TErrorSources } from '../interface/error';
+import config from '../config';
+import handleZodError from '../errors/handleZodError';
+import handleValidationError from '../errors/handleValidationErrors';
+import handleCastError from '../errors/handleCastError';
+import handleDuplicateError from '../errors/handleDuplicateError';
+
+const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+  //setting default values
+  let statusCode = error.statusCode || 500;
+  let message = error.message || 'Something went wrong';
+
+  let errorSources: TErrorSources = [
+    { path: '', message: 'Something went wrong!' },
+  ];
+
+  //checking errors
+  //for zod
+  if (error instanceof ZodError) {
+    const simplifiedError = handleZodError(error);
+
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  } else if (error?.name === 'ValidationError') {
+    const simplifiedError = handleValidationError(error);
+
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  }else if(error?.name === 'CastError'){
+    const simplifiedError = handleCastError(error);
+
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  }else if(error?.code === 11000){
+    const simplifiedError = handleDuplicateError(error);
+
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  }
 
   res.status(statusCode).json({
-    message,
     success: false,
-    error:  err,
+    message,
+    errorSources,
+    stack: config.NODE_ENV === 'development' ? error?.stack : null,
+    // error: error,
   });
-  // if (err.statusCode === 404) {
-  //   res.status(404).json({
-  //     message: err._message,
-  //     success: false,
-  //     error: err.message || err,
-  //   });
-  // } else {
-  //   res.status(500).json({
-  //     success: false,
-  //     message: err.message || err._message,
-  //     error: err || 'Something went wrong',
-  //   });
-  // } // next()
 };
 export default errorHandler;

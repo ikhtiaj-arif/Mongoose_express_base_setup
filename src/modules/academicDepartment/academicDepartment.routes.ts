@@ -19,7 +19,7 @@ const {
 
 router.post(
   '/create-academic-department',
-  ValidateRequest(createAcademicDepartmentValidationSchema),
+  // ValidateRequest(createAcademicDepartmentValidationSchema),
   createAcademicDepartment,
 );
 router.get('/', getAllAcademicDepartments);
