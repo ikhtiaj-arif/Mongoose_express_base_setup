@@ -3,7 +3,7 @@ import { AnyZodObject } from 'zod';
 
 const ValidateRequest = (schema: AnyZodObject) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log('I am the validator!', req.body);
+
     //validations
 
     //!creating schema validation using zod

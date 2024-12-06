@@ -1,9 +1,7 @@
 // 2. Create a Schema corresponding to the document interface.
-import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
 
-import config from '../../app/config';
 import {
   IGuardian,
   ILocalGuardian,
@@ -110,7 +108,7 @@ const studentSchema = new Schema<IStudent, StudentModel>(
       },
       required: [true, 'Gender is required!'],
     },
-    dateOfBirth: { type: Date },
+    dateOfBirth: { type: String },
     email: {
       type: String,
       required: [true, 'Email is required!'],
@@ -149,12 +147,22 @@ const studentSchema = new Schema<IStudent, StudentModel>(
       required: [true, 'Local Guardian information is required!'],
     },
     profileImg: { type: String },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartments',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
     },
   },
+
   {
+    timestamps: true,
     toJSON: {
       virtuals: true,
     },
@@ -164,8 +172,6 @@ const studentSchema = new Schema<IStudent, StudentModel>(
 studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName} `;
 });
-
-
 
 //!query middleware
 studentSchema.pre('find', function (next) {

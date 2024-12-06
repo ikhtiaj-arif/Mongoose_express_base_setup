@@ -19,6 +19,7 @@ app.use('/api/v1', router);
 
 const getController = (req: Request, res: Response) => {
   res.send('Hello World!');
+  // Promise.reject()
 };
 
 app.get('/', getController);
