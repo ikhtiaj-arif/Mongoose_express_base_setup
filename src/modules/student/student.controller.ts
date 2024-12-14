@@ -12,7 +12,7 @@ const getAllStudents = catchAsync(async (req, res) => {
 });
 
 const getOneStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const result = await studentServices.getOneStudentFromDB(studentId);
 
   if (result) {
@@ -30,7 +30,7 @@ const getOneStudent = catchAsync(async (req, res) => {
 });
 
 const updateOneStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const { student } = req.body;
 
   const result = await studentServices.updateStudentIntoDB(studentId, student);
@@ -50,7 +50,7 @@ const updateOneStudent = catchAsync(async (req, res) => {
 });
 
 const deleteStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const result = await studentServices.deleteStudentFromDB(studentId);
 
   if (result) {
