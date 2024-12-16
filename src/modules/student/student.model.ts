@@ -170,7 +170,11 @@ const studentSchema = new Schema<IStudent, StudentModel>(
 );
 //virtual
 studentSchema.virtual('fullName').get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName} `;
+  const { firstName, middleName, lastName } = this?.name || {};
+  if (!firstName || !middleName || !lastName) {
+    return null;
+  }
+  return `${firstName} ${middleName} ${lastName}`;
 });
 
 //!query middleware

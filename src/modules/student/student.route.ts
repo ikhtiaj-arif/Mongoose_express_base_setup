@@ -9,8 +9,8 @@ const { getAllStudents, getOneStudent, deleteStudent,updateOneStudent } = studen
 //will call controller function
 // router.post('/create-student', studentControllers.createStudent);
 router.get('/', getAllStudents);
-router.get('/:studentId', getOneStudent);
-router.patch('/:studentId', ValidateRequest(studentValidations.updateStudentValidationSchema),updateOneStudent);
-router.delete('/:studentId', deleteStudent);
+router.get('/:id', getOneStudent);
+router.patch('/:id', ValidateRequest(studentValidations.updateStudentValidationSchema),updateOneStudent);
+router.delete('/:id', deleteStudent);
 
 export const StudentRoutes = router;

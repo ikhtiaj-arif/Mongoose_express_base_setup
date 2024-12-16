@@ -2,7 +2,8 @@ import catchAsync from '../../app/utils/catchAsync';
 import { studentServices } from './student.service';
 
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await studentServices.getAllStudentsFromDB();
+  // console.log(req.query);
+  const result = await studentServices.getAllStudentsFromDB(req.query);
   res.status(200).json({
     success: true,
     message: 'Retrieved all students data!',
@@ -11,7 +12,7 @@ const getAllStudents = catchAsync(async (req, res) => {
 });
 
 const getOneStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const result = await studentServices.getOneStudentFromDB(studentId);
 
   if (result) {
@@ -29,7 +30,7 @@ const getOneStudent = catchAsync(async (req, res) => {
 });
 
 const updateOneStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const { student } = req.body;
 
   const result = await studentServices.updateStudentIntoDB(studentId, student);
@@ -49,7 +50,7 @@ const updateOneStudent = catchAsync(async (req, res) => {
 });
 
 const deleteStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const result = await studentServices.deleteStudentFromDB(studentId);
 
   if (result) {
