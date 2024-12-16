@@ -136,11 +136,9 @@ const removeFacultiesWithCourseFromDB = async (
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
     {
-    
       $pull: { faculties: { $in: payload } },
     },
     {
-     
       new: true,
     },
   );
@@ -153,5 +151,6 @@ export const CourseServices = {
   getOneCourseFromDB,
   deleteCourseFromDB,
   updateCourseIntoDB,
-  assignFacultiesWithCourseIntoDB,removeFacultiesWithCourseFromDB
+  assignFacultiesWithCourseIntoDB,
+  removeFacultiesWithCourseFromDB,
 };

@@ -1,3 +1,5 @@
+import { Model } from 'mongoose';
+
 export interface IUser {
   id: string;
   password: string;
@@ -11,4 +13,13 @@ export interface INewUser {
   password: string;
   role: string;
   id: string;
+}
+
+export interface UserModel extends Model<IUser> {
+  //create methods
+  doesUserExistsByCustomID(id: string): Promise<IUser>;
+  isPasswordMatching(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<Boolean>;
 }
