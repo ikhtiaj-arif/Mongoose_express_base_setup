@@ -1,6 +1,7 @@
 import QueryBuilder from '../../app/builder/QueryBuilder';
 import AppError from '../../app/errors/AppError';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
+import { SemesterRegStatus } from './semesterRegistration.constants';
 import { ISemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
 
@@ -14,10 +15,10 @@ const createSemesterRegistrationIntoDB = async (
     await SemesterRegistration.findOne({
       $or: [
         {
-          status: 'UPCOMING',
+          status: SemesterRegStatus.UPCOMING,
         },
         {
-          status: 'ONGOING',
+          status: SemesterRegStatus.ONGOING,
         },
       ],
     });
@@ -86,7 +87,7 @@ const updateSemesterRegistrationIntoDB = async (
   const currentSemesterStatus = doesRegisterSemesterExists?.status;
   const requestedStatus = payload?.status;
 
-  if (currentSemesterStatus === 'ENDED') {
+  if (currentSemesterStatus === SemesterRegStatus.ENDED) {
     throw new AppError(
       400,
       `This semester has already ${currentSemesterStatus}!`,
@@ -94,14 +95,20 @@ const updateSemesterRegistrationIntoDB = async (
   }
 
   //! UPCOMING --> ONGOING --> ENDED
-  if (currentSemesterStatus === 'UPCOMING' && requestedStatus === 'ENDED') {
+  if (
+    currentSemesterStatus === SemesterRegStatus.UPCOMING &&
+    requestedStatus === SemesterRegStatus.ENDED
+  ) {
     throw new AppError(
       400,
       `You can't directly change status from ${currentSemesterStatus} to ${requestedStatus}!`,
     );
   }
 
-  if (currentSemesterStatus === 'ONGOING' && requestedStatus === 'UPCOMING') {
+  if (
+    currentSemesterStatus === SemesterRegStatus.ONGOING &&
+    requestedStatus === SemesterRegStatus.UPCOMING
+  ) {
     throw new AppError(
       400,
       `You can't directly change status from ${currentSemesterStatus} to ${requestedStatus}!`,
